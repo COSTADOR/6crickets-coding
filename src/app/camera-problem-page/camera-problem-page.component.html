@@ -1,0 +1,103 @@
+<p>Suppose we want to construct a versatile software camera by combining many inflexible hardware cameras. Each hardware
+   camera works well for a particular range of subject distances and for a particular range of light levels. The
+   software camera will measure the light level and subject distance of each shot and choose an appropriate hardware
+   camera to capture it. There are many hardware cameras on the market, and we are considering various proposals for
+   which ones to include in our design. Write a function that takes the desired characteristics of the software camera
+   (range of subject distances and range of light levels that it should support) and a list of hardware cameras with
+   their respective characteristics, and tests whether that set of hardware cameras will suffice.</p>
+
+<div class="container">
+  <div class="camera-list">
+    <h2>Add hardware camera</h2>
+
+    <form (ngSubmit)="addCamera()" [formGroup]="cameraForm">
+      <div>
+        <label for="newName">Camera name:</label>
+        <input formControlName="name" id="newName" required type="text"/>
+      </div>
+      <div>
+        <label for="newColor">Color:</label>
+        <input formControlName="color" id="newColor" type="color" value="#ff0000">
+      </div>
+
+      <div>
+        <label for="minDistance">Min distance:</label>
+        <input formControlName="minDistance" id="newMinDistance" required type="number"/>
+      </div>
+
+      <div>
+        <label for="maxDistance">Max distance:</label>
+        <input formControlName="maxDistance" id="newMaxDistance" required type="number"/>
+      </div>
+
+      <div>
+        <label for="minLightLevel">Min light level:</label>
+        <input formControlName="minLightLevel" id="newMinLightLevel" required type="number"/>
+      </div>
+
+      <div>
+        <label for="maxLightLevel">Max light level:</label>
+        <input formControlName="maxLightLevel" id="newMaxLightLevel" required type="number"/>
+      </div>
+
+      <button type="submit">Add camera</button>
+    </form>
+
+    <h2>Hardware cameras:</h2>
+
+    <div *ngFor="let camera of cameras; let i = index" class="camera">
+      <h4>{{ camera.name }}
+        <button (click)="removeCamera(i)">Remove</button>
+      </h4>
+      <div>Distance: {{ camera.characteristics.minDistance }} - {{ camera.characteristics.maxDistance }}</div>
+      <div class="full-range">
+        <div [style.background]="camera.color"
+             [style.left.%]="getLeft(camera.characteristics.minDistance, minDistance, maxDistance)"
+             [style.width.%]="getWidth(camera.characteristics.minDistance, camera.characteristics.maxDistance, minDistance, maxDistance)"
+             class="covered-section">
+        </div>
+        <div [style.left.%]="getLeft(requirementsForm.value.minDistance, minDistance, maxDistance)"
+             [style.width.%]="getWidth(requirementsForm.value.minDistance, requirementsForm.value.maxDistance, minDistance, maxDistance)"
+             class="checked-section"></div>
+      </div>
+      <div>Light: {{ camera.characteristics.minLightLevel }} - {{ camera.characteristics.maxLightLevel }}</div>
+      <div class="full-range">
+        <div [style.background]="camera.color"
+             [style.left.%]="getLeft(camera.characteristics.minLightLevel, minLightLevel, maxLightLevel)"
+             [style.width.%]="getWidth(camera.characteristics.minLightLevel, camera.characteristics.maxLightLevel, minLightLevel, maxLightLevel)"
+             class="covered-section">
+        </div>
+        <div [style.left.%]="getLeft(requirementsForm.value.minLightLevel, minLightLevel, maxLightLevel)"
+             [style.width.%]="getWidth(requirementsForm.value.minLightLevel, requirementsForm.value.maxLightLevel, minLightLevel, maxLightLevel)"
+             class="checked-section"></div>
+      </div>
+    </div>
+  </div>
+  <div class="camera-check">
+    <h2>Check desired characteristics</h2>
+    <form (ngSubmit)="checkRequirements()" [formGroup]="requirementsForm">
+      <div>
+        <label for="minDistance">Min distance:</label>
+        <input formControlName="minDistance" id="minDistance" required type="number"/>
+      </div>
+
+      <div>
+        <label for="maxDistance">Max distance:</label>
+        <input formControlName="maxDistance" id="maxDistance" required type="number"/>
+      </div>
+
+      <div>
+        <label for="minLightLevel">Min light level:</label>
+        <input formControlName="minLightLevel" id="minLightLevel" required type="number"/>
+      </div>
+
+      <div>
+        <label for="maxLightLevel">Max light level:</label>
+        <input formControlName="maxLightLevel" id="maxLightLevel" required type="number"/>
+      </div>
+
+      <button type="submit">Check</button>
+    </form>
+    <p *ngIf="result !== null">Can a set of cameras cover the requirements? {{ result ? 'Yes' : 'No' }}</p>
+  </div>
+</div>
