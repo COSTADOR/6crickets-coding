@@ -116,15 +116,43 @@ export class CameraProblemPageComponent implements OnDestroy {
     requirements: CameraCharacteristics,
     cameras: HardwareCamera[]
   ): boolean {
-    return cameras.some(camera => {
-      const {minDistance, maxDistance, minLightLevel, maxLightLevel} = camera.characteristics;
-      return (
-        minDistance <= requirements.minDistance &&
-        maxDistance >= requirements.maxDistance &&
-        minLightLevel <= requirements.minLightLevel &&
-        maxLightLevel >= requirements.maxLightLevel
+    return this.isRangeCovered(
+        requirements.minDistance,
+        requirements.maxDistance,
+        cameras.map(c => ({
+          min: c.characteristics.minDistance,
+          max: c.characteristics.maxDistance
+        }))
+      )
+      && this.isRangeCovered(
+        requirements.minLightLevel,
+        requirements.maxLightLevel,
+        cameras.map(c => ({
+          min: c.characteristics.minLightLevel,
+          max: c.characteristics.maxLightLevel
+        }))
       );
-    });
+  }
+
+  isRangeCovered(
+    requiredMin: number,
+    requiredMax: number,
+    ranges: {min: number; max: number}[]
+  ): boolean {
+    ranges.sort((a, b) => a.min - b.min);
+
+    let currentMax = requiredMin;
+    for (const {min, max} of ranges) {
+      if (min > currentMax) {
+        return false;
+      }
+      currentMax = Math.max(currentMax, max);
+      if (currentMax >= requiredMax) {
+        return true;
+      }
+    }
+
+    return currentMax >= requiredMax;
   }
 
   getLeft(value: number, min: number, max: number): number {
